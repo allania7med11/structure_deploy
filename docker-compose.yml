@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: structure_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./db/structure_db_init.sql:/docker-entrypoint-initdb.d/structure_db_init.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  structure_back:
+    build:
+      context: ./structure_back  # Directory containing Dockerfile for backend
+    env_file: ./structure_back/.env 
+    depends_on:
+      - db
+    volumes:
+      - ./structure_back:/app  # Map the backend directory to the container
+    ports:
+      - "8000:8000"
+    # Add any additional configuration for backend service like ports, volumes, etc.
+
+  structure_front:
+    build:
+      context: ./structure_front  # Directory containing Dockerfile for frontend
+    env_file: ./structure_front/.env 
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./structure_front:/app  # Map the frontend directory to the container
+      - /app/node_modules # Exclude node_modules from the volume mapping
+    # Add any additional configuration for frontend service like ports, volumes, etc.
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "4000:80"
+    depends_on:
+      - structure_back
+      - structure_front
+
+volumes:
+  postgres_data:
