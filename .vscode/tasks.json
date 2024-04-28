@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Backup PostgreSQL Database",
+            "type": "shell",
+            "command": "docker exec structure-db-1 pg_dump -U postgres -d structure_db -f /app/backup.sql",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            }
+        }
+    ]
+}
